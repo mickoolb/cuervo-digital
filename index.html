@@ -11,16 +11,16 @@
     <style>
         /* ═══════════════════ DESIGN TOKENS ═══════════════════ */
         :root {
-            --bg: #0B0B12;
-            --bg-card: #151520;
-            --bg-muted: #1A1A28;
-            --fg: #E8E8F0;
-            --fg-muted: #8B8B9E;
-            --accent: #8B5CF6;
-            --accent-glow: rgba(139, 92, 246, 0.25);
-            --amber: #F59E0B;
-            --amber-glow: rgba(245, 158, 11, 0.2);
-            --border: #1E1E30;
+            --bg: #0A0E17;
+            --bg-card: #111827;
+            --bg-muted: #1A2438;
+            --fg: #E2E8F0;
+            --fg-muted: #8892B0;
+            --accent: #0052CC;
+            --accent-glow: rgba(0, 82, 204, 0.25);
+            --cyan: #00BCD4;
+            --cyan-glow: rgba(0, 188, 212, 0.2);
+            --border: #1E293B;
             --green: #34D399;
             --green-dim: rgba(52, 211, 153, 0.15);
             --radius: 14px;
@@ -67,7 +67,7 @@
         }
         .orb-2 {
             width: 400px; height: 400px;
-            background: var(--amber);
+            background: var(--cyan);
             bottom: -10%; right: -5%;
             animation-delay: -7s;
         }
@@ -112,13 +112,11 @@
         }
         .nav-logo .logo-icon {
             display: inline-flex; align-items: center; justify-content: center;
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--amber));
-            border-radius: 10px;
-            font-size: 1.1rem;
-            color: #fff;
-            font-weight: 700;
-            animation: logoPulse 3s ease-in-out infinite;
+            width: auto; height: 32px;
+        }
+        .nav-logo .logo-icon img {
+            height: 32px; width: auto;
+            display: block;
         }
         @keyframes logoPulse {
             0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
@@ -163,6 +161,16 @@
             padding-top: 6rem;
         }
         .hero-content { max-width: 780px; }
+        .hero-logo {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+        .hero-logo img {
+            height: 72px;
+            width: auto;
+            filter: drop-shadow(0 0 30px rgba(0, 82, 204, 0.3));
+        }
         .hero-badge {
             display: inline-block;
             padding: 0.35rem 1rem;
@@ -183,7 +191,7 @@
             margin-bottom: 1.2rem;
         }
         .hero h1 .gradient-text {
-            background: linear-gradient(135deg, var(--accent), var(--amber), var(--accent));
+            background: linear-gradient(135deg, var(--accent), var(--cyan), var(--accent));
             background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -255,7 +263,7 @@
         .hero-stat .num {
             font-family: var(--font-heading);
             font-size: 1.8rem; font-weight: 700;
-            background: linear-gradient(135deg, var(--accent), var(--amber));
+            background: linear-gradient(135deg, var(--accent), var(--cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -347,7 +355,7 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 2px;
-            background: linear-gradient(90deg, var(--accent), var(--amber));
+            background: linear-gradient(90deg, var(--accent), var(--cyan));
             opacity: 0;
             transition: var(--transition);
         }
@@ -376,7 +384,7 @@
             font-family: var(--font-heading);
             font-size: 1.6rem;
             font-weight: 700;
-            color: var(--amber);
+            color: var(--cyan);
         }
         .service-price small {
             font-size: 0.8rem;
@@ -389,7 +397,7 @@
             font-size: 0.9rem;
             color: var(--fg-muted);
         }
-        .price-note strong { color: var(--amber); }
+        .price-note strong { color: var(--cyan); }
 
         /* ═══════════════════ CÓMO FUNCIONA ═══════════════════ */
         .pasos {
@@ -414,7 +422,7 @@
             position: absolute;
             top: 2.5rem; left: 15%; right: 15%;
             height: 2px;
-            background: linear-gradient(90deg, var(--accent), var(--amber), var(--accent));
+            background: linear-gradient(90deg, var(--accent), var(--cyan), var(--accent));
             opacity: 0.3;
         }
         .paso {
@@ -423,7 +431,7 @@
         .paso-num {
             width: 48px; height: 48px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--amber));
+            background: linear-gradient(135deg, var(--accent), var(--cyan));
             display: flex; align-items: center; justify-content: center;
             font-family: var(--font-heading);
             font-weight: 700;
@@ -607,7 +615,7 @@
     <!-- ═══ NAV ═══ -->
     <nav>
         <a href="#" class="nav-logo">
-            <span class="logo-icon">⬡</span>
+            <span class="logo-icon"><img src="assets/logo.png" alt="Núcleo Digital"></span>
             Núcleo Digital
         </a>
         <div class="nav-links">
@@ -621,6 +629,7 @@
     <!-- ═══ HERO ═══ -->
     <section class="hero" id="hero">
         <div class="hero-content reveal">
+            <div class="hero-logo"><img src="assets/logo.png" alt="Núcleo Digital"></div>
             <div class="hero-badge">⬡ Código real · Gente real · Sin humo</div>
             <h1>
                 Tu negocio merece<br>
@@ -901,7 +910,7 @@
                 speedY: (Math.random() - 0.5) * 0.15,
                 opacity: Math.random() * 0.3 + 0.05,
                 symbol: symbols[Math.floor(Math.random() * symbols.length)],
-                hue: Math.random() > 0.5 ? 260 : 40  // purple or amber
+                hue: Math.random() > 0.5 ? 210 : 180  // blue or cyan
             });
         }
 
