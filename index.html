@@ -15,6 +15,7 @@
             --muted: #868692;
             --accent: #c084fc;
             --accent-dim: #7c3aed;
+            --accent-glow: rgba(192, 132, 252, 0.15);
             --green: #4ade80;
             --font: 'Inter', -apple-system, sans-serif;
             --mono: 'JetBrains Mono', monospace;
@@ -27,14 +28,25 @@
             font-family: var(--font);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-        /* Header */
+        /* ===== PARTICLES CANVAS ===== */
+        #particles-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ===== HEADER ===== */
         header {
+            position: relative;
+            z-index: 10;
             padding: 1.5rem 2rem;
             max-width: 1200px;
             margin: 0 auto;
@@ -42,6 +54,8 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            background: rgba(10, 10, 11, 0.6);
         }
         .logo {
             font-size: 1.5rem;
@@ -49,22 +63,39 @@
             letter-spacing: -0.02em;
         }
         .logo span { color: var(--accent); }
-        .logo .emoji { font-size: 1.3rem; margin-right: 4px; }
+        .logo .emoji { font-size: 1.3rem; margin-right: 4px; display: inline-block; animation: spinLogo 8s linear infinite; }
+        @keyframes spinLogo {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         nav a {
             color: var(--muted);
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 500;
             margin-left: 2rem;
-            transition: color 0.2s;
+            transition: all 0.3s;
+            position: relative;
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+            border-radius: 2px;
         }
         nav a:hover { color: var(--text); }
+        nav a:hover::after { width: 100%; }
 
-        /* Hero */
+        /* ===== HERO ===== */
         .hero {
+            position: relative;
+            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 6rem 2rem 4rem;
+            padding: 8rem 2rem 5rem;
             text-align: center;
         }
         .hero-badge {
@@ -79,30 +110,57 @@
             margin-bottom: 1.5rem;
             letter-spacing: 0.05em;
             text-transform: uppercase;
+            opacity: 0;
+            animation: fadeUp 0.6s 0.1s ease forwards;
         }
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: 4rem;
             font-weight: 800;
             line-height: 1.1;
             letter-spacing: -0.03em;
             margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp 0.6s 0.2s ease forwards;
         }
         .hero h1 .highlight {
-            background: linear-gradient(135deg, var(--accent), #e879f9);
+            background: linear-gradient(135deg, var(--accent), #e879f9, #f472b6);
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            animation: gradientShift 4s ease infinite;
         }
-        .hero p {
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .hero-subtitle {
             color: var(--muted);
             font-size: 1.2rem;
             max-width: 600px;
             margin: 0 auto 2.5rem;
+            min-height: 1.8em;
+            opacity: 0;
+            animation: fadeUp 0.6s 0.3s ease forwards;
+        }
+        .hero-subtitle .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background: var(--accent);
+            margin-left: 2px;
+            animation: blink 0.8s step-end infinite;
+            vertical-align: text-bottom;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
         }
         .hero-cta {
             display: flex;
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeUp 0.6s 0.4s ease forwards;
         }
         .btn {
             padding: 0.85rem 2rem;
@@ -112,20 +170,21 @@
             font-weight: 600;
             border: none;
             cursor: pointer;
-            transition: all 0.25s;
+            transition: all 0.3s;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
         }
         .btn-primary {
-            background: var(--accent);
+            background: linear-gradient(135deg, var(--accent), #a78bfa);
             color: #000;
         }
         .btn-primary:hover {
-            background: #a78bfa;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(192, 132, 252, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(192, 132, 252, 0.35);
         }
         .btn-outline {
             background: transparent;
@@ -135,10 +194,57 @@
         .btn-outline:hover {
             border-color: var(--accent);
             background: rgba(192, 132, 252, 0.08);
+            transform: translateY(-2px);
         }
 
-        /* Philosophy section */
+        /* ===== FADE UP ANIMATION ===== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== REVEAL ON SCROLL ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-scale.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ===== PHILOSOPHY ===== */
         .philosophy {
+            position: relative;
+            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
             padding: 4rem 2rem;
@@ -159,8 +265,10 @@
             font-style: normal;
         }
 
-        /* Services */
+        /* ===== SERVICES ===== */
         .services {
+            position: relative;
+            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
             padding: 4rem 2rem;
@@ -170,6 +278,7 @@
             font-weight: 800;
             margin-bottom: 0.5rem;
         }
+        .section-title .accent { color: var(--accent); }
         .section-sub {
             color: var(--muted);
             margin-bottom: 3rem;
@@ -185,18 +294,41 @@
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 2rem;
-            transition: all 0.25s;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
+            overflow: hidden;
         }
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(192, 132, 252, 0.03));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .service-card:hover::before { opacity: 1; }
         .service-card:hover {
             border-color: var(--accent-dim);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(192, 132, 252, 0.05);
         }
+        .service-card .glow-line {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        .service-card:hover .glow-line { transform: translateX(100%); }
         .service-icon {
             font-size: 2rem;
             margin-bottom: 1rem;
+            display: inline-block;
+            transition: transform 0.3s;
         }
+        .service-card:hover .service-icon { transform: scale(1.15); }
         .service-card h3 {
             font-size: 1.25rem;
             font-weight: 700;
@@ -210,11 +342,19 @@
         .service-card .includes {
             font-size: 0.8rem;
             color: var(--muted);
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
             padding-left: 1.2rem;
+            list-style: none;
         }
         .service-card .includes li {
             margin-bottom: 0.3rem;
+            position: relative;
+        }
+        .service-card .includes li::before {
+            content: '→';
+            position: absolute;
+            left: -1.2rem;
+            color: var(--accent);
         }
         .service-card .price {
             font-family: var(--mono);
@@ -222,10 +362,19 @@
             font-weight: 700;
             color: var(--green);
         }
+        .service-card .price .old {
+            font-size: 1rem;
+            color: var(--muted);
+            text-decoration: line-through;
+            font-weight: 400;
+            margin-right: 0.5rem;
+        }
         .service-card .price-sub {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--muted);
             font-weight: 400;
+            display: block;
+            margin-top: 0.2rem;
         }
         .service-card .tag {
             position: absolute;
@@ -240,9 +389,24 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+        .service-card .tag-new {
+            background: rgba(192, 132, 252, 0.15);
+            color: var(--accent);
+        }
+        .pricing-note {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-align: center;
+            font-weight: 500;
+            opacity: 0;
+            animation: fadeUp 0.6s 0.6s ease forwards;
+        }
 
-        /* What we DON'T do */
+        /* ===== NO-HUMO ===== */
         .no-humo {
+            position: relative;
+            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem 2rem 4rem;
@@ -252,7 +416,9 @@
             border: 1px solid rgba(239, 68, 68, 0.15);
             border-radius: 16px;
             padding: 2rem;
+            transition: border-color 0.3s;
         }
+        .no-humo-box:hover { border-color: rgba(239, 68, 68, 0.3); }
         .no-humo-box h3 {
             color: #f87171;
             font-size: 1.1rem;
@@ -260,7 +426,7 @@
         }
         .no-humo-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1rem;
         }
         .no-humo-item {
@@ -275,9 +441,18 @@
             left: 0;
             color: #f87171;
         }
+        .no-humo-item .explain {
+            display: block;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.15rem;
+            line-height: 1.4;
+        }
 
-        /* Process */
+        /* ===== PROCESS ===== */
         .process {
+            position: relative;
+            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
             padding: 4rem 2rem;
@@ -291,11 +466,13 @@
         .step {
             text-align: center;
             padding: 1.5rem;
+            transition: transform 0.3s;
         }
+        .step:hover { transform: translateY(-4px); }
         .step-num {
             width: 48px;
             height: 48px;
-            background: var(--accent);
+            background: linear-gradient(135deg, var(--accent), #a78bfa);
             color: #000;
             border-radius: 50%;
             display: flex;
@@ -304,6 +481,12 @@
             font-weight: 800;
             font-size: 1.2rem;
             margin: 0 auto 1rem;
+            box-shadow: 0 4px 20px rgba(192, 132, 252, 0.2);
+            transition: all 0.3s;
+        }
+        .step:hover .step-num {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(192, 132, 252, 0.35);
         }
         .step h4 {
             font-weight: 600;
@@ -314,8 +497,10 @@
             font-size: 0.85rem;
         }
 
-        /* About / Real talk */
+        /* ===== REAL TALK ===== */
         .real-talk {
+            position: relative;
+            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
             padding: 4rem 2rem;
@@ -325,6 +510,18 @@
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .real-talk-content::before {
+            content: '⬡';
+            position: absolute;
+            right: -2rem; bottom: -2rem;
+            font-size: 12rem;
+            color: rgba(192, 132, 252, 0.04);
+            font-weight: 800;
+            line-height: 1;
+            pointer-events: none;
         }
         .real-talk-content h2 {
             font-size: 1.8rem;
@@ -335,14 +532,18 @@
             color: var(--muted);
             max-width: 700px;
             margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
         }
         .real-talk-content .highlight-text {
             color: var(--accent);
             font-weight: 600;
         }
 
-        /* Contact */
+        /* ===== CONTACT ===== */
         .contact {
+            position: relative;
+            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
             padding: 4rem 2rem;
@@ -369,7 +570,9 @@
             margin-bottom: 0.8rem;
             color: var(--muted);
             font-size: 0.9rem;
+            transition: transform 0.3s;
         }
+        .contact-method:hover { transform: translateX(4px); }
         .contact-method .emoji { font-size: 1.2rem; }
         .contact-method a {
             color: var(--accent);
@@ -390,22 +593,23 @@
             font-family: var(--font);
             font-size: 0.95rem;
             color: var(--text);
-            transition: border-color 0.2s;
+            transition: all 0.3s;
         }
         form input:focus, form textarea:focus {
             outline: none;
             border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.1);
         }
         form textarea {
             min-height: 120px;
             resize: vertical;
         }
-        form .btn {
-            align-self: flex-start;
-        }
+        form .btn { align-self: flex-start; }
 
-        /* Footer */
+        /* ===== FOOTER ===== */
         footer {
+            position: relative;
+            z-index: 1;
             border-top: 1px solid var(--border);
             padding: 2rem;
             text-align: center;
@@ -414,18 +618,15 @@
             max-width: 1200px;
             margin: 0 auto;
         }
-        footer .footer-brand {
-            color: var(--text);
-            font-weight: 600;
-        }
+        footer .footer-brand { color: var(--text); font-weight: 600; }
         footer span { color: var(--accent); }
 
-        /* Responsive */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             header { padding: 1rem 1.5rem; }
             nav a { margin-left: 1rem; font-size: 0.8rem; }
-            .hero h1 { font-size: 2.2rem; }
-            .hero { padding: 4rem 1.5rem 2rem; }
+            .hero h1 { font-size: 2.5rem; }
+            .hero { padding: 6rem 1.5rem 3rem; }
             .services-grid { grid-template-columns: 1fr; }
             .contact-flex { grid-template-columns: 1fr; }
             .process-steps { grid-template-columns: 1fr 1fr; }
@@ -435,35 +636,14 @@
             .process-steps { grid-template-columns: 1fr; }
             .service-card .price { font-size: 1.2rem; }
         }
-
-        /* Transitions */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeIn 0.6s ease forwards;
-        }
-        @keyframes fadeIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-
-        /* Hosting note */
-        .hosting-note {
-            background: rgba(192, 132, 252, 0.06);
-            border: 1px solid rgba(192, 132, 252, 0.12);
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            margin-top: 2rem;
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-        .hosting-note strong { color: var(--accent); }
     </style>
 </head>
 <body>
 
+<!-- ===== PARTICLES ===== -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ===== HEADER ===== -->
 <header>
     <div class="logo">
         <span class="emoji">⬡</span>CUERVO <span>DIGITAL</span>
@@ -475,23 +655,22 @@
     </nav>
 </header>
 
+<!-- ===== HERO ===== -->
 <section class="hero">
-    <div class="hero-badge fade-in">📍 Chile — Servicios Web Reales</div>
-    <h1 class="fade-in delay-1">
+    <div class="hero-badge">📍 Chile — Servicios Web Reales</div>
+    <h1>
         Páginas web que <span class="highlight">funcionan</span>.<br>
         Sin humo. Sin vueltas.
     </h1>
-    <p class="fade-in delay-2">
-        Construimos sitios web profesionales, rápidos y modernos para negocios chilenos.
-        Tú te dedicas a tu negocio — nosotros nos encargamos de tu presencia digital.
-    </p>
-    <div class="hero-cta fade-in delay-3">
+    <p class="hero-subtitle" id="typing-text"></p>
+    <div class="hero-cta">
         <a href="#servicios" class="btn btn-primary">Ver servicios →</a>
         <a href="#contacto" class="btn btn-outline">Escríbenos</a>
     </div>
 </section>
 
-<section class="philosophy fade-in">
+<!-- ===== PHILOSOPHY ===== -->
+<section class="philosophy reveal">
     <blockquote>
         "No vendemos humo. No prometemos lo que no podemos entregar.
         <strong>Creamos sitios reales, con código real, para negocios reales.</strong>
@@ -499,121 +678,139 @@
     </blockquote>
 </section>
 
+<!-- ===== SERVICES ===== -->
 <section id="servicios" class="services">
-    <h2 class="section-title">Servicios</h2>
-    <p class="section-sub">Esto es lo que construimos. Nada más, nada menos. Precios en CLP ($ pesos chilenos).</p>
+    <h2 class="section-title">Servicios <span class="accent">•</span></h2>
+    <p class="section-sub">Esto es lo que construimos. Nada más, nada menos.</p>
     
     <div class="services-grid">
-        <div class="service-card">
-            <div class="tag">Más rápido</div>
+        <div class="service-card reveal-scale">
+            <div class="glow-line"></div>
+            <div class="tag tag-new">⭐ Recomendado</div>
             <div class="service-icon">🪶</div>
             <h3>Landing Page</h3>
             <p>Una página profesional para tu negocio. Perfecta para empezar.</p>
             <ul class="includes">
-                <li>✅ Diseño responsive (celular + PC)</li>
-                <li>✅ Formulario de contacto</li>
-                <li>✅ Hosting gratis (GitHub Pages)</li>
-                <li>✅ Entrega en 24-48 hrs</li>
+                <li>Diseño responsive (celular + PC)</li>
+                <li>Formulario de contacto</li>
+                <li>Hosting gratis (GitHub Pages)</li>
+                <li>Entrega en 24-48 hrs</li>
             </ul>
-            <div class="price">$120.000 <span class="price-sub">CLP</span></div>
+            <div class="price"><span class="old">$120.000</span>$80.000 <span class="price-sub">CLP · Precio lanzamiento</span></div>
         </div>
 
-        <div class="service-card">
+        <div class="service-card reveal-scale" style="transition-delay: 0.1s;">
+            <div class="glow-line"></div>
             <div class="service-icon">🏢</div>
             <h3>Sitio Web Completo</h3>
             <p>Hasta 5 páginas para tu negocio. La presencia digital que mereces.</p>
             <ul class="includes">
-                <li>✅ Inicio, Nosotros, Servicios, Galería, Contacto</li>
-                <li>✅ Diseño profesional responsive</li>
-                <li>✅ Formulario + mapa + redes</li>
-                <li>✅ Hosting gratis incluido</li>
+                <li>Inicio, Nosotros, Servicios, Galería, Contacto</li>
+                <li>Diseño profesional responsive</li>
+                <li>Formulario + mapa + redes</li>
+                <li>Hosting gratis incluido</li>
             </ul>
-            <div class="price">$280.000 <span class="price-sub">CLP</span></div>
+            <div class="price"><span class="old">$280.000</span>$150.000 <span class="price-sub">CLP · Precio lanzamiento</span></div>
         </div>
 
-        <div class="service-card">
+        <div class="service-card reveal-scale" style="transition-delay: 0.2s;">
+            <div class="glow-line"></div>
             <div class="service-icon">⚙️</div>
             <h3>Automatización Python</h3>
             <p>Scripts a medida para automatizar tareas repetitivas de tu negocio.</p>
             <ul class="includes">
-                <li>✅ Procesamiento de archivos</li>
-                <li>✅ Extracción de datos web</li>
-                <li>✅ Reportes automáticos</li>
-                <li>✅ Código documentado + instrucciones</li>
+                <li>Procesamiento de archivos</li>
+                <li>Extracción de datos web</li>
+                <li>Reportes automáticos</li>
+                <li>Código documentado + instrucciones</li>
             </ul>
-            <div class="price">$200.000 <span class="price-sub">CLP</span></div>
+            <div class="price"><span class="old">$200.000</span>$100.000 <span class="price-sub">CLP · Precio lanzamiento</span></div>
         </div>
 
-        <div class="service-card">
+        <div class="service-card reveal-scale" style="transition-delay: 0.3s;">
+            <div class="glow-line"></div>
             <div class="service-icon">🤖</div>
             <h3>Chatbot Web Simple</h3>
             <p>Un asistente automático para tu sitio web. Responde preguntas frecuentes 24/7.</p>
             <ul class="includes">
-                <li>✅ Widget flotante para tu web</li>
-                <li>✅ Responde preguntas de tus clientes</li>
-                <li>✅ Personalizado para tu negocio</li>
-                <li>✅ Integración en 1 día</li>
+                <li>Widget flotante para tu web</li>
+                <li>Responde preguntas de tus clientes</li>
+                <li>Personalizado para tu negocio</li>
+                <li>Integración en 1 día</li>
             </ul>
-            <div class="price">$250.000 <span class="price-sub">CLP</span></div>
+            <div class="price"><span class="old">$250.000</span>$120.000 <span class="price-sub">CLP · Precio lanzamiento</span></div>
         </div>
 
-        <div class="service-card">
+        <div class="service-card reveal-scale" style="transition-delay: 0.4s;">
+            <div class="glow-line"></div>
             <div class="service-icon">🧰</div>
             <h3>Herramienta Web a Medida</h3>
             <p>Calculadoras, generadores, catálogos, buscadores — lo que necesites.</p>
             <ul class="includes">
-                <li>✅ Herramienta web funcional en HTML/JS</li>
-                <li>✅ Diseño limpio y responsive</li>
-                <li>✅ Hosting gratis incluido</li>
-                <li>✅ Entrega rápida</li>
+                <li>Herramienta web funcional en HTML/JS</li>
+                <li>Diseño limpio y responsive</li>
+                <li>Hosting gratis incluido</li>
+                <li>Prototipo rápido</li>
             </ul>
-            <div class="price">$180.000 <span class="price-sub">CLP</span></div>
+            <div class="price"><span class="old">$180.000</span>$90.000 <span class="price-sub">CLP · Precio lanzamiento</span></div>
         </div>
     </div>
 
-    <div class="hosting-note">
+    <p class="pricing-note">⬡ Precios de lanzamiento — una vez que armemos portafolio, suben. Aprovecha ahora.</p>
+
+    <div class="hosting-note reveal">
         <strong>⬡ Nota importante:</strong> Todos nuestros sitios incluyen hosting gratuito en GitHub Pages. 
         Si necesitas dominio propio (.cl, .com), lo gestionamos por separado (~$15.000 CLP/año).
         Sin costos ocultos. Sin suscripciones mensuales.
     </div>
 </section>
 
-<section id="no-humo" class="no-humo">
+<!-- ===== NO HUMO ===== -->
+<section id="no-humo" class="no-humo reveal">
     <div class="no-humo-box">
         <h3>⛔ Esto NO lo hacemos (honestidad ante todo)</h3>
         <div class="no-humo-grid">
-            <div class="no-humo-item">Apps móviles nativas (Android/iOS)</div>
-            <div class="no-humo-item">Sistemas de pago complejos</div>
-            <div class="no-humo-item">Diseño gráfico profesional (logos, branding)</div>
-            <div class="no-humo-item">Plataformas tipo red social</div>
-            <div class="no-humo-item">Sistemas de reservas con pagos</div>
-            <div class="no-humo-item">Backend con base de datos 24/7</div>
-            <div class="no-humo-item">Aplicaciones en tiempo real</div>
-            <div class="no-humo-item">E-commerce completo (solo tiendas básicas)</div>
+            <div class="no-humo-item">Apps móviles nativas (Android/iOS)
+                <span class="explain">No creamos apps de tienda, solo sitios web adaptables a celular.</span></div>
+            <div class="no-humo-item">Sistemas de pago complejos
+                <span class="explain">Para vender online se necesitan servicios externos como Flow o Mercado Pago.</span></div>
+            <div class="no-humo-item">Diseño gráfico profesional (logos, branding)
+                <span class="explain">No somos diseñadores gráficos. Construimos sitios web limpios y modernos, pero el logo y la identidad visual los debe crear un diseñador o tú mismo. Te guiamos con plantillas limpias eso sí.</span></div>
+            <div class="no-humo-item">Plataformas tipo red social
+                <span class="explain">Sistemas multiusuario con registro, perfiles y feeds son otro nivel de desarrollo.</span></div>
+            <div class="no-humo-item">Sistemas de reservas con pagos
+                <span class="explain">Integrar agenda + pago requiere APIs externas y mantención constante.</span></div>
+            <div class="no-humo-item">Backend con base de datos 24/7
+                <span class="explain">Nuestros sitios son estáticos. Rápidos, seguros, pero sin servidor dinámico.</span></div>
+            <div class="no-humo-item">Aplicaciones en tiempo real
+                <span class="explain">Chats en vivo, notificaciones push, streaming — eso escapa de nuestro alcance por ahora.</span></div>
+            <div class="no-humo-item">E-commerce completo con bodega
+                <span class="explain">Tiendas básicas si, pero sin inventario automatizado ni pasarela de pago integrada.</span></div>
         </div>
     </div>
 </section>
 
-<section id="proceso" class="process">
-    <h2 class="section-title">Cómo trabajamos</h2>
+<!-- ===== PROCESS ===== -->
+<section id="proceso" class="process reveal">
+    <h2 class="section-title">Cómo <span class="accent">trabajamos</span></h2>
     <p class="section-sub">Directo, sin burocracia.</p>
     <div class="process-steps">
-        <div class="step">
+        <div class="step reveal-scale">
             <div class="step-num">1</div>
             <h4>Nos contactas</h4>
             <p>Cuéntanos qué necesitas por WhatsApp, Instagram o el formulario.</p>
         </div>
-        <div class="step">
+        <div class="step reveal-scale" style="transition-delay: 0.1s;">
             <div class="step-num">2</div>
             <h4>Te cotizamos</h4>
             <p>En máximo 24 hrs tienes un precio fijo. Sin sorpresas.</p>
         </div>
-        <div class="step">
+        <div class="step reveal-scale" style="transition-delay: 0.2s;">
             <div class="step-num">3</div>
             <h4>Construimos</h4>
             <p>Desarrollamos tu sitio. Te enviamos avances si quieres.</p>
         </div>
-        <div class="step">
+        <div class="step reveal-scale" style="transition-delay: 0.3s;">
             <div class="step-num">4</div>
             <h4>Entregamos</h4>
             <p>Te damos el sitio terminado y te explicamos cómo usarlo.</p>
@@ -621,7 +818,8 @@
     </div>
 </section>
 
-<section class="real-talk">
+<!-- ===== REAL TALK ===== -->
+<section class="real-talk reveal">
     <div class="real-talk-content">
         <h2>⬡ Una conversación real</h2>
         <p>
@@ -644,7 +842,8 @@
     </div>
 </section>
 
-<section id="contacto" class="contact">
+<!-- ===== CONTACT ===== -->
+<section id="contacto" class="contact reveal">
     <h2 class="section-title">Háblanos</h2>
     <p class="section-sub">Sin compromiso. Cuéntanos qué necesitas y te respondemos en el día.</p>
     <div class="contact-flex">
@@ -674,10 +873,139 @@
     </div>
 </section>
 
+<!-- ===== FOOTER ===== -->
 <footer>
     <p><span class="footer-brand">⬡ CUERVO DIGITAL</span> — Hecho con <span>❤</span> desde Chile</p>
     <p style="margin-top: 0.5rem; font-size: 0.8rem;">Código real. Gente real. Sin humo.</p>
 </footer>
+
+<script>
+// ===== PARTICLES (feathers) =====
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const particles = [];
+const COUNT = 40;
+const SYMBOLS = ['⬡', '◇', '·', '~'];
+
+for (let i = 0; i < COUNT; i++) {
+    particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -0.1 - Math.random() * 0.2,
+        size: 8 + Math.random() * 16,
+        alpha: 0.03 + Math.random() * 0.05,
+        symbol: SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.01,
+    });
+}
+
+function drawParticles() {
+    ctx.clearRect(0, 0, W, H);
+    
+    for (const p of particles) {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = '#c084fc';
+        ctx.font = `${p.size}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.symbol, 0, 0);
+        ctx.restore();
+        
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rotation += p.rotSpeed;
+        
+        // Reset when off screen
+        if (p.y < -50 || p.x < -50 || p.x > W + 50) {
+            p.y = H + 20;
+            p.x = Math.random() * W;
+            p.vx = (Math.random() - 0.5) * 0.3;
+        }
+    }
+    
+    requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ===== TYPING EFFECT =====
+const phrases = [
+    'Construimos sitios web profesionales para negocios chilenos.',
+    'Tú te dedicas a tu negocio — nosotros a tu presencia digital.',
+    'Sin suscripciones. Sin contratos eternos. Código real.',
+    'De Chile, para Chile. Sin humo.',
+];
+let phraseIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+const typingElement = document.getElementById('typing-text');
+
+function typeEffect() {
+    const currentPhrase = phrases[phraseIndex];
+    
+    if (!isDeleting) {
+        typingElement.innerHTML = currentPhrase.substring(0, charIndex + 1) + '<span class="cursor"></span>';
+        charIndex++;
+        
+        if (charIndex === currentPhrase.length) {
+            isDeleting = true;
+            setTimeout(typeEffect, 2500);
+            return;
+        }
+        setTimeout(typeEffect, 40 + Math.random() * 30);
+    } else {
+        typingElement.innerHTML = currentPhrase.substring(0, charIndex - 1) + '<span class="cursor"></span>';
+        charIndex--;
+        
+        if (charIndex === 0) {
+            isDeleting = false;
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+            setTimeout(typeEffect, 500);
+            return;
+        }
+        setTimeout(typeEffect, 20 + Math.random() * 20);
+    }
+}
+setTimeout(typeEffect, 800);
+
+// ===== SCROLL REVEAL =====
+const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+
+const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    }
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+for (const el of revealElements) {
+    observer.observe(el);
+}
+
+// ===== PARALLAX HEADER ON SCROLL =====
+window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    const hero = document.querySelector('.hero');
+    if (hero && scrollY < window.innerHeight) {
+        hero.style.transform = `translateY(${scrollY * 0.15}px)`;
+        hero.style.opacity = 1 - scrollY / (window.innerHeight * 0.8);
+    }
+});
+</script>
 
 </body>
 </html>
