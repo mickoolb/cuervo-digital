@@ -73,7 +73,7 @@
         }
         .orb-3 {
             width: 300px; height: 300px;
-            background: #3B82F6;
+            background: #6D28D9;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             animation-delay: -14s;
@@ -89,6 +89,27 @@
         #particles-canvas {
             position: fixed; inset: 0; z-index: 0;
             pointer-events: none;
+        }
+
+        /* ═══════════════════ 3D TILT CARDS ═══════════════════ */
+        .tilt-3d {
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        .tilt-3d::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(139, 92, 246, 0.14), transparent 65%);
+            opacity: 0;
+            transition: opacity 200ms ease-out;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .tilt-3d:hover::after { opacity: 1; }
+        @media (prefers-reduced-motion: reduce) {
+            .tilt-3d { transform: none !important; }
         }
 
         /* ═══════════════════ NAV ═══════════════════ */
@@ -839,6 +860,7 @@
     </footer>
 
     <!-- ═══ SCRIPTS ═══ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
     <script>
         // ═══ Scroll Reveal ═══
         const observer = new IntersectionObserver((entries) => {
@@ -885,57 +907,218 @@
         }
         typeLoop();
 
-        // ═══ Particles ═══
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
+        // ═══ Fondo 3D (Three.js) — con fallback 2D ═══
+        const particlesCanvas = document.getElementById('particles-canvas');
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        function init3DBackground() {
+            let renderer;
+            try {
+                renderer = new THREE.WebGLRenderer({ canvas: particlesCanvas, alpha: true, antialias: false, powerPreference: 'low-power' });
+            } catch (e) {
+                return false;
+            }
+            if (!renderer.getContext()) return false;
 
-        const symbols = ['⬡', '◇', '·', '~', '+', '∘'];
-        const pCount = Math.min(Math.floor(window.innerWidth * 0.05), 55);
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.z = 18;
 
-        for (let i = 0; i < pCount; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 10 + 6,
-                speedX: (Math.random() - 0.5) * 0.15,
-                speedY: (Math.random() - 0.5) * 0.15,
-                opacity: Math.random() * 0.3 + 0.05,
-                symbol: symbols[Math.floor(Math.random() * symbols.length)],
-                hue: Math.random() > 0.5 ? 260 : 40  // purple or amber
+            const world = new THREE.Group();
+            scene.add(world);
+
+            const symbols = ['<>', '{ }', '=>', '</>', ';', '#', '()', '[]', '&&', '⬡', '◇', '~', '+', '∘', 'fn', 'if', '//'];
+            const colors = ['#8B5CF6', '#8B5CF6', '#8B5CF6', '#8B5CF6', '#8B5CF6', '#8B5CF6', '#F59E0B', '#F59E0B', '#F59E0B'];
+            const texCache = {};
+
+            function spriteTexture(symbol, color) {
+                const key = symbol + color;
+                if (texCache[key]) return texCache[key];
+                const c = document.createElement('canvas');
+                c.width = 128; c.height = 128;
+                const g = c.getContext('2d');
+                g.font = '700 56px Consolas, "Segoe UI", monospace';
+                g.textAlign = 'center';
+                g.textBaseline = 'middle';
+                g.shadowColor = color;
+                g.shadowBlur = 16;
+                g.fillStyle = color;
+                g.fillText(symbol, 64, 64);
+                const tex = new THREE.CanvasTexture(c);
+                texCache[key] = tex;
+                return tex;
+            }
+
+            // Menos partículas en equipos modestos (la 920MX agradece)
+            const isLowEnd = !navigator.hardwareConcurrency || navigator.hardwareConcurrency <= 4;
+            const count = isLowEnd ? 42 : Math.min(80, Math.floor(window.innerWidth * 0.045));
+
+            for (let i = 0; i < count; i++) {
+                const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const mat = new THREE.SpriteMaterial({
+                    map: spriteTexture(symbol, color),
+                    transparent: true,
+                    opacity: 0.2 + Math.random() * 0.45,
+                    depthWrite: false
+                });
+                const sprite = new THREE.Sprite(mat);
+                const s = 0.5 + Math.random() * 1.6;
+                sprite.scale.set(s, s, 1);
+                sprite.position.set(
+                    (Math.random() - 0.5) * 36,
+                    (Math.random() - 0.5) * 20,
+                    -4 - Math.random() * 14
+                );
+                world.add(sprite);
+            }
+
+            // La cámara sigue al mouse: parallax 3D real
+            const mouse = { x: 0, y: 0 };
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
+                mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
             });
+
+            function onResize() {
+                const w = window.innerWidth, h = window.innerHeight;
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+                renderer.setSize(w, h, false); // el CSS controla el tamaño visual
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+            }
+            onResize();
+            window.addEventListener('resize', onResize);
+
+            let t = 0;
+            function animate() {
+                requestAnimationFrame(animate);
+                t += 0.001;
+                world.rotation.y = Math.sin(t * 1.3) * 0.28;
+                world.rotation.x = Math.sin(t * 0.85) * 0.12;
+                camera.position.x += (mouse.x * 2.4 - camera.position.x) * 0.045;
+                camera.position.y += (-mouse.y * 1.6 - camera.position.y) * 0.045;
+                camera.lookAt(0, 0, 0);
+                renderer.render(scene, camera);
+            }
+            animate();
+            return true;
         }
 
-        function drawParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.x += p.speedX;
-                p.y += p.speedY;
-                if (p.x < 0) p.x = canvas.width;
-                if (p.x > canvas.width) p.x = 0;
-                if (p.y < 0) p.y = canvas.height;
-                if (p.y > canvas.height) p.y = 0;
+        function init2DParticles() {
+            const ctx = particlesCanvas.getContext('2d');
+            let particles = [];
 
-                ctx.font = `${p.size}px sans-serif`;
-                ctx.globalAlpha = p.opacity;
-                if (p.hue === 260) {
-                    ctx.fillStyle = '#8B5CF6';
-                } else {
-                    ctx.fillStyle = '#F59E0B';
+            function resizeCanvas() {
+                particlesCanvas.width = window.innerWidth;
+                particlesCanvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const symbols = ['⬡', '◇', '·', '~', '+', '∘'];
+            const pCount = Math.min(Math.floor(window.innerWidth * 0.05), 55);
+
+            for (let i = 0; i < pCount; i++) {
+                particles.push({
+                    x: Math.random() * particlesCanvas.width,
+                    y: Math.random() * particlesCanvas.height,
+                    size: Math.random() * 10 + 6,
+                    speedX: (Math.random() - 0.5) * 0.15,
+                    speedY: (Math.random() - 0.5) * 0.15,
+                    opacity: Math.random() * 0.3 + 0.05,
+                    symbol: symbols[Math.floor(Math.random() * symbols.length)],
+                    hue: Math.random() > 0.5 ? 260 : 40  // purple or amber
+                });
+            }
+
+            function drawParticles() {
+                ctx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
+                particles.forEach(p => {
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    if (p.x < 0) p.x = particlesCanvas.width;
+                    if (p.x > particlesCanvas.width) p.x = 0;
+                    if (p.y < 0) p.y = particlesCanvas.height;
+                    if (p.y > particlesCanvas.height) p.y = 0;
+
+                    ctx.font = `${p.size}px sans-serif`;
+                    ctx.globalAlpha = p.opacity;
+                    ctx.fillStyle = p.hue === 260 ? '#8B5CF6' : '#F59E0B';
+                    ctx.fillText(p.symbol, p.x, p.y);
+                });
+                ctx.globalAlpha = 1;
+                requestAnimationFrame(drawParticles);
+            }
+            drawParticles();
+        }
+
+        function startBackground() {
+            if (window.THREE && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                try {
+                    if (init3DBackground()) return;
+                } catch (e) { /* WebGL no disponible → fallback 2D */ }
+            }
+            init2DParticles();
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startBackground);
+        } else {
+            startBackground();
+        }
+
+        // ═══ Tilt 3D en tarjetas ═══
+        (function () {
+            if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            const cards = document.querySelectorAll('.service-card, .trato-card, .no-humo-card, .paso, .contact-card');
+            const MAX = 6;
+            cards.forEach(card => {
+                card.classList.add('tilt-3d');
+                let raf = null, timer = null;
+                card.addEventListener('mouseenter', () => {
+                    if (timer) { clearTimeout(timer); timer = null; }
+                    card.style.transition = 'transform 120ms ease-out';
+                });
+                card.addEventListener('mousemove', (e) => {
+                    if (card.classList.contains('reveal') && !card.classList.contains('visible')) return;
+                    const r = card.getBoundingClientRect();
+                    const px = (e.clientX - r.left) / r.width - 0.5;
+                    const py = (e.clientY - r.top) / r.height - 0.5;
+                    card.style.setProperty('--mx', `${((px + 0.5) * 100).toFixed(1)}%`);
+                    card.style.setProperty('--my', `${((py + 0.5) * 100).toFixed(1)}%`);
+                    if (raf) cancelAnimationFrame(raf);
+                    raf = requestAnimationFrame(() => {
+                        card.style.transform = `perspective(800px) rotateX(${(-py * MAX).toFixed(2)}deg) rotateY(${(px * MAX).toFixed(2)}deg) translateY(-4px)`;
+                    });
+                });
+                card.addEventListener('mouseleave', () => {
+                    if (raf) cancelAnimationFrame(raf);
+                    card.style.transition = 'transform 250ms ease-out';
+                    card.style.transform = '';
+                    timer = setTimeout(() => { card.style.transition = ''; }, 280);
+                });
+            });
+        })();
+
+        // ═══ Parallax de orbes con el mouse ═══
+        (function () {
+            const orbBg = document.getElementById('orb-bg');
+            if (!orbBg) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            const mouse = { x: 0, y: 0 };
+            let ticking = false;
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX / window.innerWidth - 0.5;
+                mouse.y = e.clientY / window.innerHeight - 0.5;
+                if (!ticking) {
+                    ticking = true;
+                    requestAnimationFrame(() => {
+                        orbBg.style.transform = `translate3d(${(-mouse.x * 28).toFixed(1)}px, ${(-mouse.y * 18).toFixed(1)}px, 0)`;
+                        ticking = false;
+                    });
                 }
-                ctx.fillText(p.symbol, p.x, p.y);
             });
-            ctx.globalAlpha = 1;
-            requestAnimationFrame(drawParticles);
-        }
-        drawParticles();
+        })();
 
         // ═══ Smooth scroll for anchor links ═══
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
