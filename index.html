@@ -103,16 +103,22 @@
             transition: var(--transition);
         }
         .nav-logo {
-            display: flex; align-items: center;
+            display: flex; align-items: center; gap: 0.6rem;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.3rem;
             text-decoration: none;
+            color: var(--fg);
         }
         .nav-logo .logo-icon {
             display: inline-flex; align-items: center; justify-content: center;
-            width: auto; height: 42px;
-        }
-        .nav-logo .logo-icon img {
-            height: 42px; width: auto;
-            display: block;
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--amber));
+            border-radius: 10px;
+            font-size: 1.1rem;
+            color: #fff;
+            font-weight: 700;
+            animation: logoPulse 3s ease-in-out infinite;
         }
         @keyframes logoPulse {
             0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
@@ -157,16 +163,6 @@
             padding-top: 6rem;
         }
         .hero-content { max-width: 780px; }
-        .hero-logo {
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: center;
-        }
-        .hero-logo img {
-            height: 120px;
-            width: auto;
-            filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.4));
-        }
         .hero-badge {
             display: inline-block;
             padding: 0.35rem 1rem;
@@ -619,7 +615,8 @@
     <!-- ═══ NAV ═══ -->
     <nav>
         <a href="#" class="nav-logo">
-            <span class="logo-icon"><img src="assets/logo.png" alt="Núcleo Digital"></span>
+            <span class="logo-icon">⬡</span>
+            Núcleo Digital
         </a>
         <div class="nav-links">
             <a href="#servicios">Servicios</a>
@@ -632,7 +629,6 @@
     <!-- ═══ HERO ═══ -->
     <section class="hero" id="hero">
         <div class="hero-content reveal">
-            <div class="hero-logo"><img src="assets/logo.png" alt="Núcleo Digital"></div>
             <div class="hero-badge">⬡ Código real · Gente real · Sin humo</div>
             <h1>
                 Tu negocio merece<br>
