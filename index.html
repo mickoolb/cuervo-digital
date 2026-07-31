@@ -11,16 +11,16 @@
     <style>
         /* ═══════════════════ DESIGN TOKENS ═══════════════════ */
         :root {
-            --bg: #0A0E17;
-            --bg-card: #111827;
-            --bg-muted: #1A2438;
-            --fg: #E2E8F0;
-            --fg-muted: #8892B0;
-            --accent: #0052CC;
-            --accent-glow: rgba(0, 82, 204, 0.25);
-            --cyan: #00BCD4;
-            --cyan-glow: rgba(0, 188, 212, 0.2);
-            --border: #1E293B;
+            --bg: #0B0B12;
+            --bg-card: #151520;
+            --bg-muted: #1A1A28;
+            --fg: #E8E8F0;
+            --fg-muted: #8B8B9E;
+            --accent: #8B5CF6;
+            --accent-glow: rgba(139, 92, 246, 0.25);
+            --amber: #F59E0B;
+            --amber-glow: rgba(245, 158, 11, 0.2);
+            --border: #2A2A3A;
             --green: #34D399;
             --green-dim: rgba(52, 211, 153, 0.15);
             --radius: 14px;
@@ -67,7 +67,7 @@
         }
         .orb-2 {
             width: 400px; height: 400px;
-            background: var(--cyan);
+            background: var(--amber);
             bottom: -10%; right: -5%;
             animation-delay: -7s;
         }
@@ -165,7 +165,7 @@
         .hero-logo img {
             height: 120px;
             width: auto;
-            filter: drop-shadow(0 0 40px rgba(0, 82, 204, 0.3));
+            filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.4));
         }
         .hero-badge {
             display: inline-block;
@@ -187,7 +187,7 @@
             margin-bottom: 1.2rem;
         }
         .hero h1 .gradient-text {
-            background: linear-gradient(135deg, var(--accent), var(--cyan), var(--accent));
+            background: linear-gradient(135deg, var(--accent), var(--amber), var(--accent));
             background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -259,7 +259,7 @@
         .hero-stat .num {
             font-family: var(--font-heading);
             font-size: 1.8rem; font-weight: 700;
-            background: linear-gradient(135deg, var(--accent), var(--cyan));
+            background: linear-gradient(135deg, var(--accent), var(--amber));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -351,7 +351,7 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 2px;
-            background: linear-gradient(90deg, var(--accent), var(--cyan));
+            background: linear-gradient(90deg, var(--accent), var(--amber));
             opacity: 0;
             transition: var(--transition);
         }
@@ -380,7 +380,15 @@
             font-family: var(--font-heading);
             font-size: 1.6rem;
             font-weight: 700;
-            color: var(--cyan);
+            color: var(--amber);
+        }
+        .old-price {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            color: var(--fg-muted);
+            text-decoration: line-through;
+            margin-right: 0.6rem;
+            opacity: 0.6;
         }
         .service-price small {
             font-size: 0.8rem;
@@ -393,7 +401,7 @@
             font-size: 0.9rem;
             color: var(--fg-muted);
         }
-        .price-note strong { color: var(--cyan); }
+        .price-note strong { color: var(--amber); }
 
         /* ═══════════════════ CÓMO FUNCIONA ═══════════════════ */
         .pasos {
@@ -418,7 +426,7 @@
             position: absolute;
             top: 2.5rem; left: 15%; right: 15%;
             height: 2px;
-            background: linear-gradient(90deg, var(--accent), var(--cyan), var(--accent));
+            background: linear-gradient(90deg, var(--accent), var(--amber), var(--accent));
             opacity: 0.3;
         }
         .paso {
@@ -427,7 +435,7 @@
         .paso-num {
             width: 48px; height: 48px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--cyan));
+            background: linear-gradient(135deg, var(--accent), var(--amber));
             display: flex; align-items: center; justify-content: center;
             font-family: var(--font-heading);
             font-weight: 700;
@@ -706,31 +714,31 @@
                 <div class="service-icon">🪶</div>
                 <h3>Landing Page</h3>
                 <p>Página profesional de una sola vista. Perfecta para presentar tu negocio, servicio o producto.</p>
-                <div class="service-price">$80.000 <small>CLP</small></div>
+                <div class="service-price"><span class="old-price">$120.000</span>$80.000 <small>CLP</small></div>
             </div>
             <div class="service-card reveal reveal-delay-1">
                 <div class="service-icon">🏢</div>
                 <h3>Sitio Web Completo</h3>
                 <p>Múltiples páginas: inicio, servicios, contacto, blog, galería. Ideal para negocios establecidos.</p>
-                <div class="service-price">$150.000 <small>CLP</small></div>
+                <div class="service-price"><span class="old-price">$250.000</span>$150.000 <small>CLP</small></div>
             </div>
             <div class="service-card reveal reveal-delay-2">
                 <div class="service-icon">⚙️</div>
                 <h3>Automatización Python</h3>
                 <p>Scripts que hacen el trabajo pesado: reportes automáticos, procesamiento de datos, web scraping.</p>
-                <div class="service-price">$100.000 <small>CLP</small></div>
+                <div class="service-price"><span class="old-price">$160.000</span>$100.000 <small>CLP</small></div>
             </div>
             <div class="service-card reveal reveal-delay-2">
                 <div class="service-icon">💬</div>
                 <h3>Chatbot Web Simple</h3>
                 <p>Chatbot funcional para tu sitio. Responde preguntas frecuentes, captura leads, atiende 24/7.</p>
-                <div class="service-price">$120.000 <small>CLP</small></div>
+                <div class="service-price"><span class="old-price">$180.000</span>$120.000 <small>CLP</small></div>
             </div>
             <div class="service-card reveal reveal-delay-3">
                 <div class="service-icon">🧰</div>
                 <h3>Herramienta Web a Medida</h3>
                 <p>¿Necesitas algo específico? Un panel, un cotizador, un gestor simple. Lo conversamos y lo construimos.</p>
-                <div class="service-price">$90.000 <small>CLP</small></div>
+                <div class="service-price"><span class="old-price">$140.000</span>$90.000 <small>CLP</small></div>
             </div>
         </div>
         <div class="price-note reveal">
@@ -905,7 +913,7 @@
                 speedY: (Math.random() - 0.5) * 0.15,
                 opacity: Math.random() * 0.3 + 0.05,
                 symbol: symbols[Math.floor(Math.random() * symbols.length)],
-                hue: Math.random() > 0.5 ? 210 : 180  // blue or cyan
+                hue: Math.random() > 0.5 ? 260 : 40  // purple or amber
             });
         }
 
